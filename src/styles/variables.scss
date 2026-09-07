@@ -1,0 +1,91 @@
+// ============================
+// 全局 SCSS 变量
+// 零碳园区能碳数字化平台设计规范
+// ============================
+
+// ---- 主题色 ----
+$primary-color: #1890FF;
+$primary-hover: #40A9FF;
+$primary-active: #096DD9;
+$success-color: #52C41A;
+$warning-color: #FAAD14;
+$danger-color: #FF4D4F;
+$info-color: #1890FF;
+
+// ---- 功能色（红警、黄提、蓝稳）----
+$alarm-red: #FF4D4F;
+$alarm-yellow: #FAAD14;
+$alarm-blue: #1890FF;
+
+// ---- 中性色 ----
+$text-primary: #262626;
+$text-regular: #595959;
+$text-secondary: #8C8C8C;
+$text-placeholder: #BFBFBF;
+$border-color: #D9D9D9;
+$border-color-light: #E8E8E8;
+$divider-color: #F0F0F0;
+$background-color: #F0F2F5;
+$background-white: #FFFFFF;
+
+// ---- 侧边栏 ----
+$sidebar-dark-bg: #1B6B9C;
+$sidebar-dark-item: #175A82;
+$sidebar-light-bg: #F0F2F5;
+$sidebar-width: 220px;
+$sidebar-collapsed-width: 64px;
+
+// ---- 顶部导航 ----
+$topbar-height: 64px;
+$topbar-bg: #1B6B9C;
+
+// ---- 字体 ----
+$font-d-din: 'D-DIN', 'DIN Alternate', 'Helvetica Neue', sans-serif;
+$font-title: '优设标题黑', 'YouSheBiaoTiHei', sans-serif;
+$font-body: '思源黑体', 'Source Han Sans CN', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+// ---- 字号 ----
+$font-size-10: 10px;
+$font-size-12: 12px;
+$font-size-14: 14px;
+$font-size-16: 16px;
+$font-size-18: 18px;
+$font-size-20: 20px;
+$font-size-24: 24px;
+$font-size-88: 88px;
+
+// ---- 行高 ----
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+
+// ---- 间距 ----
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// ---- 圆角 ----
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+// ---- 卡片 ----
+$card-padding: 24px;
+$card-margin: 16px;
+$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+$card-radius: 8px;
+
+// ---- 控件 ----
+$control-height: 32px;
+$control-radius: 4px;
+
+// ---- 动画 ----
+$transition-duration: 0.3s;
+$flash-duration: 0.5s;
+
+// ---- 布局 ----
+$page-margin: 20px;
+$gutter: 16px;
+$sidebar-assistant-width: 320px;

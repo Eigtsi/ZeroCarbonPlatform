@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>模块4：能流分析 — 产品设计文档</title>
+<style>
+  body { font-family: 'Microsoft YaHei','SimSun',sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.8; }
+  h1 { text-align: center; font-size: 22px; border-bottom: 2px solid #1890FF; padding-bottom: 12px; }
+  h2 { font-size: 18px; border-left: 3px solid #1890FF; padding-left: 10px; margin-top: 32px; }
+  h3 { font-size: 15px; color: #1890FF; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid #d9d9d9; padding: 6px 10px; text-align: left; }
+  th { background: #f5f5f5; font-weight: 600; }
+  p { margin: 8px 0; }
+  .meta { text-align: center; color: #999; font-size: 13px; margin-bottom: 24px; }
+  ul { margin: 4px 0; padding-left: 24px; }
+  .note { background: #fafafa; border-left: 3px solid #faad14; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .equation { background: #f0f7ff; padding: 8px 14px; border-radius: 4px; font-family: 'Times New Roman',serif; font-size: 15px; text-align: center; margin: 8px 0; }
+</style>
+</head>
+<body>
+
+<h1>模块4：能流分析</h1>
+<p class="meta">版本 V2.0 | 更新日期：2026-08-11 | 基于系统实际开发输出</p>
+
+<h2>4.1 功能定位</h2>
+<p>能流分析模块是能碳管理平台的能量流向可视化与效率诊断核心，依据 GB/T 28749《企业能量平衡通则》和 GB/T 28751《企业能量平衡表编制方法》，以桑基图（Sankey Diagram）为主可视化手段，直观展示园区内能量从购入→转换→分配→终端利用全过程的流向、流量和损失分布，支撑能量平衡校验和节能机会识别。</p>
+
+<p>本模块覆盖<b>能量流动全景可视化</b>、<b>能量平衡方程校验</b>、<b>损失诊断排名</b>和<b>损失趋势追踪</b>四大功能，形成"看到流→验平衡→查损失→追趋势"的闭环分析链路。</p>
+
+<h2>4.2 功能概述</h2>
+<ul>
+  <li>能流概况 KPI：总能量输入、有效利用能量、损失能量、综合能效比 4 项核心指标</li>
+  <li>桑基图（能量流向图）：可视化展示从能源购入到终端利用的全过程能量流动，左侧为能源输入（煤炭/天然气/电力/蒸汽），右侧为有效产出和各类损失</li>
+  <li>能量平衡验证面板：以公式化展示输入=有效+损失的能量平衡关系，含平衡校验结果（通过/未通过）和偏差率</li>
+  <li>能量平衡明细：按能源品类（煤炭/天然气/电力/蒸汽/余热回收）分别展示输入、有效、损失和效率</li>
+  <li>能量流向分配明细表：每笔能量输送的来源、工艺环节、有效输出、损失量、损失类型、利用效率、去向</li>
+  <li>能量损失排名：按损失量降序排列的横向排名条</li>
+  <li>损失类型分布：环形饼图展示各类损失占比（烟气损失/散热损失/传导损失/压缩热损/电机损耗/其他）</li>
+  <li>损失趋势：月度/季度切换的堆叠柱状图，追踪各类损失的时间变化</li>
+  <li>组织架构和日期范围筛选</li>
+</ul>
+
+<h2>4.3 用户角色</h2>
+<table>
+  <tr><th>角色</th><th>权限</th></tr>
+  <tr><td>能源管理员</td><td>全部功能：查看桑基图、能量平衡、损失分析、导出能流报告</td></tr>
+  <tr><td>部门经理</td><td>查看本车间相关的能量流向和损失数据</td></tr>
+  <tr><td>设备工程师</td><td>查看设备级能量输入输出和效率数据</td></tr>
+  <tr><td>只读用户</td><td>查看所有能流分析数据和图表</td></tr>
+</table>
+
+<h2>4.4 能源输入品类</h2>
+<p>能流分析的能源输入与全系统6大品类保持一致，桑基图中以4种主要外部输入能源展示：</p>
+<table>
+  <tr><th>输入能源</th><th>对应6大品类</th><th>计量单位</th><th>月度典型输入量(GJ)</th><th>桑基图颜色</th><th>数据来源</th></tr>
+  <tr><td>煤炭</td><td>固体燃料</td><td>GJ</td><td>15,680</td><td style="color:#8B572A">棕色 #8B572A</td><td>地磅+计量点</td></tr>
+  <tr><td>天然气</td><td>气体燃料</td><td>GJ</td><td>11,850</td><td style="color:#2FC25B">绿色 #2FC25B</td><td>燃气表+计量点</td></tr>
+  <tr><td>电力</td><td>电力</td><td>GJ</td><td>15,970</td><td style="color:#1890FF">蓝色 #1890FF</td><td>进线电表</td></tr>
+  <tr><td>蒸汽</td><td>热力</td><td>GJ</td><td>8,180</td><td style="color:#FACC14">金色 #FACC14</td><td>蒸汽流量计</td></tr>
+</table>
+<p class="note"><b>单位换算：</b>所有能源输入统一换算为 GJ（吉焦）进行能量平衡计算。1 tce ≈ 29.3076 GJ。液体燃料和其他燃料的量较小，在桑基图中可归并至"其他燃料"输入节点。</p>
+
+<h2>4.5 能量流节点定义</h2>
+<p>桑基图采用 4 层 14 节点的能量流拓扑：</p>
+
+<h3>4.5.1 第1层：能源输入（源节点）</h3>
+<table>
+  <tr><th>节点</th><th>能量值(GJ)</th><th>说明</th></tr>
+  <tr><td>煤炭</td><td>15,680</td><td>燃煤锅炉用煤</td></tr>
+  <tr><td>天然气</td><td>11,850</td><td>锅炉+直燃工艺</td></tr>
+  <tr><td>电力</td><td>15,970</td><td>全厂供电</td></tr>
+  <tr><td>蒸汽</td><td>8,180</td><td>外购蒸汽</td></tr>
+</table>
+
+<h3>4.5.2 第2层：能量转换/分配（中间节点）</h3>
+<table>
+  <tr><th>节点</th><th>能量值(GJ)</th><th>说明</th></tr>
+  <tr><td>锅炉系统</td><td>23,930</td><td>煤+气 → 蒸汽/热水转换</td></tr>
+  <tr><td>生产车间一</td><td>13,380</td><td>天然气直燃+电力+蒸汽</td></tr>
+  <tr><td>生产车间二</td><td>8,360</td><td>电力+蒸汽</td></tr>
+  <tr><td>压缩系统</td><td>3,860</td><td>电力 → 压缩空气</td></tr>
+  <tr><td>辅助系统</td><td>2,150</td><td>电力 → 照明/暖通/水处理</td></tr>
+</table>
+
+<h3>4.5.3 第3层：终端输出（汇节点）</h3>
+<table>
+  <tr><th>节点</th><th>能量值(GJ)</th><th>说明</th></tr>
+  <tr><td>有效产出</td><td>37,892.6</td><td>实际做功/工艺利用的能量总和</td></tr>
+  <tr><td>散热损失</td><td>4,903.2</td><td>设备/管道表面散热</td></tr>
+  <tr><td>烟气损失</td><td>3,190</td><td>排烟携带的热量</td></tr>
+  <tr><td>传导损失</td><td>3,410</td><td>管道/设备传导热损</td></tr>
+  <tr><td>其他损失</td><td>3,007.4</td><td>压缩热损、电机损耗等</td></tr>
+</table>
+
+<h2>4.6 页面功能详述</h2>
+
+<h3>4.6.1 顶部工具栏</h3>
+<ul>
+  <li>组织架构级联选择器（集团→公司→车间→产线→设备，5级）</li>
+  <li>自由日期范围选择器（开始日期 ~ 结束日期）</li>
+  <li>刷新按钮</li>
+</ul>
+
+<h3>4.6.2 能流概况 KPI 卡片</h3>
+<p>4 张 KPI 卡片一行排列：</p>
+<table>
+  <tr><th>指标</th><th>单位</th><th>说明</th><th>趋势含义</th></tr>
+  <tr><td>总能量输入</td><td>GJ</td><td>统计期内所有外部购入能源的总热值</td><td>↑ 增长（产量增加或效率下降）</td></tr>
+  <tr><td>有效利用能量</td><td>GJ</td><td>实际转化为有效功/工艺热能的能量</td><td>↑ 增长（产出增加）</td></tr>
+  <tr><td>损失能量</td><td>GJ</td><td>未被有效利用的散失能量合计</td><td>↓ 下降（效率改善）</td></tr>
+  <tr><td>综合能效比</td><td>%</td><td>有效利用能量 ÷ 总输入能量</td><td>↑ 增长（效率提升）</td></tr>
+</table>
+
+<h3>4.6.3 桑基图（能量流动图）</h3>
+<p>全页面最核心的可视化组件，展示14节点20条能量流的桑基图：</p>
+<ul>
+  <li>左侧：4个能源输入节点（煤炭/天然气/电力/蒸汽）</li>
+  <li>中间：5个转换/分配节点（锅炉系统/生产车间一/生产车间二/压缩系统/辅助系统）</li>
+  <li>右侧：5个输出节点（有效产出/散热损失/烟气损失/传导损失/其他损失）</li>
+  <li>连线宽度表示能量流量大小，颜色渐变（源节点颜色→汇节点颜色）</li>
+  <li>鼠标悬停显示：来源→去向 + 能量值(GJ)</li>
+  <li>高度 480px，使用 ECharts sankey 类型</li>
+</ul>
+
+<h3>4.6.4 能量平衡验证面板</h3>
+<p>以公式化布局展示能量平衡关系：</p>
+<div class="equation">总输入能量 = 有效利用能量 + 损失能量</div>
+<ul>
+  <li>三个大号数字框并列展示：总输入 | = | 有效利用 | + | 损失能量</li>
+  <li>下方显示校验结果徽章：<b>平衡校验通过</b>（绿色）或 <b>平衡校验未通过</b>（红色）</li>
+  <li>显示偏差率百分比（应 ≤ 5% 视为通过）</li>
+</ul>
+
+<h4>能量平衡明细卡</h4>
+<p>5 列并列卡片（煤炭/天然气/电力/蒸汽/余热回收），每张卡片展示：</p>
+<table>
+  <tr><th>展示项</th><th>说明</th></tr>
+  <tr><td>品类名称 + 颜色圆点</td><td>煤/气/电/蒸汽/余热</td></tr>
+  <tr><td>输入(GJ)</td><td>该品类本期的总输入能量</td></tr>
+  <tr><td>有效(GJ)</td><td>该品类本期有效利用能量</td></tr>
+  <tr><td>损失(GJ)</td><td>该品类本期损失能量（红色标注）</td></tr>
+  <tr><td>效率(%)</td><td>有效/输入的比例</td></tr>
+</table>
+
+<h3>4.6.5 能量流向分配明细表</h3>
+<p>分页表格，列出每笔能量的详细流动信息：</p>
+<table>
+  <tr><th>列名</th><th>类型</th><th>说明</th></tr>
+  <tr><td>能量来源</td><td>文本</td><td>煤炭/天然气/电力/蒸汽</td></tr>
+  <tr><td>输入量(GJ)</td><td>D-DIN 数字</td><td>该流向的输入能量值</td></tr>
+  <tr><td>工艺环节</td><td>文本</td><td>锅炉燃烧/电机驱动/直接加热/空气压缩/工艺加热/供暖空调</td></tr>
+  <tr><td>有效输出(GJ)</td><td>D-DIN 数字</td><td>经过该环节后的有效能量</td></tr>
+  <tr><td>损失量(GJ)</td><td>D-DIN 红色数字</td><td>该环节的能量损失（红色强调）</td></tr>
+  <tr><td>损失类型</td><td>文本</td><td>烟气+散热/排烟损失/电机损耗/压缩热损/管道散热/管网损失/辐射散热</td></tr>
+  <tr><td>利用效率(%)</td><td>D-DIN 数字</td><td>有效输出 ÷ 输入量</td></tr>
+  <tr><td>去向</td><td>文本</td><td>蒸汽/热水/工艺热能/机械能/压缩空气/暖通系统</td></tr>
+</table>
+
+<h3>4.6.6 能量损失排名</h3>
+<p>左侧为排名列表，右侧为损失类型分布环形饼图：</p>
+<ul>
+  <li>排名列表：8项损失类型按损失量降序排列，每行显示排名徽章（前3名红色/橙色/金色）、损失名称、横向进度条（可视化损失占比）、损失值(GJ)和百分比</li>
+  <li>环形饼图：6类损失（烟气/散热/传导/压缩热/电机/其他），不同颜色，显示图例</li>
+</ul>
+
+<table>
+  <tr><th>排名</th><th>损失类型</th><th>损失量(GJ)</th><th>占比</th><th>主要环节</th></tr>
+  <tr><td>1</td><td>锅炉排烟损失</td><td>4,789.5</td><td>32.4%</td><td>锅炉系统</td></tr>
+  <tr><td>2</td><td>压缩热损失</td><td>1,739.7</td><td>11.8%</td><td>压缩系统</td></tr>
+  <tr><td>3</td><td>管网散热损失</td><td>1,423.0</td><td>9.6%</td><td>蒸汽管网</td></tr>
+  <tr><td>4</td><td>锅炉散热损失</td><td>1,180.0</td><td>8.0%</td><td>锅炉本体</td></tr>
+  <tr><td>5</td><td>管道传导损失</td><td>1,056.0</td><td>7.1%</td><td>生产车间一</td></tr>
+  <tr><td>6</td><td>电机损耗</td><td>1,056.0</td><td>7.1%</td><td>各车间电机</td></tr>
+  <tr><td>7</td><td>辐射散热</td><td>743.2</td><td>5.0%</td><td>高温设备</td></tr>
+  <tr><td>8</td><td>其他损失</td><td>2,807.5</td><td>18.9%</td><td>综合</td></tr>
+</table>
+
+<h3>4.6.7 损失趋势图</h3>
+<p>堆叠柱状图，双 Tab（月度/季度）：</p>
+<table>
+  <tr><th>Tab</th><th>X 轴</th><th>Y 轴</th><th>系列</th></tr>
+  <tr><td>月度</td><td>1月-12月</td><td>GJ</td><td>烟气损失(红) / 散热损失(橙) / 传导损失(金) / 其他损失(灰)，堆叠</td></tr>
+  <tr><td>季度</td><td>Q1-Q4</td><td>GJ</td><td>同上</td></tr>
+</table>
+
+<h2>4.7 指标计算公式详解</h2>
+
+<h3>4.7.1 综合能效比 — KPI 卡片</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>η<sub>综合</sub> = E<sub>有效</sub> ÷ E<sub>总输入</sub> × 100%</b></td></tr>
+  <tr><td>符号</td><td>η<sub>综合</sub>：综合能效比(%)；E<sub>有效</sub>：所有环节有效利用能量之和(GJ)；E<sub>总输入</sub>：所有外部输入能量之和(GJ)</td></tr>
+  <tr><td>能量类型归一化</td><td>所有能源品种消耗量均需先换算为 GJ（吉焦）：煤炭按低位发热量、天然气按 35.59 MJ/m³、电力按 3.6 MJ/kWh 等</td></tr>
+  <tr><td>示例</td><td>E<sub>总输入</sub> = 15,680 + 11,850 + 15,970 + 8,180 = 51,680.50 GJ<br>E<sub>有效</sub> = 37,892.60 GJ<br>η<sub>综合</sub> = 37,892.60 ÷ 52,680.50 ÷ 100 = 71.9%（注意：加上余热回收1000.5GJ内循环不计入外购）</td></tr>
+</table>
+
+<h3>4.7.2 能量平衡方程 — 平衡验证面板</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>基本原理</td><td>能量守恒定律：<b>E<sub>输入</sub> = E<sub>有效利用</sub> + E<sub>损失</sub></b></td></tr>
+  <tr><td>扩展公式</td><td><b>E<sub>输入</sub> = E<sub>有效产出</sub> + E<sub>散热损失</sub> + E<sub>烟气损失</sub> + E<sub>传导损失</sub> + E<sub>其他损失</sub></b></td></tr>
+  <tr><td>偏差率公式</td><td><b>d = |E<sub>输入</sub> − (E<sub>有效</sub> + ΣE<sub>损失</sub>)| ÷ E<sub>输入</sub> × 100%</b></td></tr>
+  <tr><td>校验标准</td><td>d ≤ 5% → 平衡校验通过（可接受的计量误差和估算公差）<br>d > 5% → 平衡校验未通过，需核查计量点数据或校准仪表</td></tr>
+  <tr><td>示例</td><td>52,680.50 − (37,892.60 + 14,787.90) = 0.00 → d = 0.00% → 通过</td></tr>
+</table>
+
+<h3>4.7.3 环节/设备能效 — 平衡明细卡 + 分配明细表</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>η<sub>环节</sub> = E<sub>有效输出</sub> ÷ E<sub>输入</sub> × 100%</b></td></tr>
+  <tr><td>符号</td><td>η<sub>环节</sub>：该工艺环节或设备的能量利用效率(%)；E<sub>有效输出</sub>：经过该环节后转化为有效功/热能的能量；E<sub>输入</sub>：进入该环节的总能量</td></tr>
+  <tr><td>设备级示例</td><td>锅炉系统：η = 10,890.50 ÷ 15,680.00 = 69.5%（燃煤锅炉典型效率 65-75%）<br>空压机：η = 2,120.30 ÷ 3,860.00 = 54.9%（压缩过程大量热损）</td></tr>
+  <tr><td>品类级示例</td><td>天然气综合：η = 9,126.80 ÷ 11,850.00 = 77.0%（含锅炉+直燃）</td></tr>
+</table>
+
+<h3>4.7.4 损失占比 — 损失排名 + 饼图</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>P<sub>损失,i</sub> = E<sub>损失,i</sub> ÷ E<sub>总损失</sub> × 100%</b></td></tr>
+  <tr><td>符号</td><td>P<sub>损失,i</sub>：第 i 类损失占总损失的比例(%)；E<sub>损失,i</sub>：该类损失的绝对量(GJ)；E<sub>总损失</sub>：所有类型损失之和</td></tr>
+  <tr><td>示例</td><td>排烟损失占比 = 4,789.5 ÷ 14,787.9 × 100% = 32.4%（最大损失项）</td></tr>
+</table>
+
+<h3>4.7.5 能源品种单位换算</h3>
+<table>
+  <tr><th>能源品种</th><th>实物单位</th><th>换算系数</th><th>折 GJ</th></tr>
+  <tr><td>原煤（5,000 kcal/kg）</td><td>1 t</td><td>低位发热量 20.934 GJ/t</td><td>20.934 GJ</td></tr>
+  <tr><td>天然气</td><td>1 万 m³</td><td>低位发热量 355.9 GJ/万m³</td><td>355.9 GJ</td></tr>
+  <tr><td>电力</td><td>1 万 kWh</td><td>热功当量 3.6 GJ/万kWh</td><td>3.6 GJ</td></tr>
+  <tr><td>蒸汽（0.6MPa）</td><td>1 t</td><td>焓值约 2.756 GJ/t</td><td>2.756 GJ</td></tr>
+  <tr><td>柴油</td><td>1 t</td><td>低位发热量 42.652 GJ/t</td><td>42.652 GJ</td></tr>
+</table>
+<p class="note"><b>设计要点：</b>折标煤系数（kgce/单位）与折GJ系数可互相验证：1 tce = 29.3076 GJ。系统内部存储 tce 值用于能耗统计，能流分析时统一换算为 GJ 以保持热力学一致性。</p>
+
+<h3>4.7.6 公式汇总速查表</h3>
+<table>
+  <tr><th>序号</th><th>公式名称</th><th>公式</th><th>单位</th><th>所在位置</th></tr>
+  <tr><td>1</td><td>综合能效比</td><td>η = E<sub>有效</sub> ÷ E<sub>总输入</sub></td><td>%</td><td>KPI卡片</td></tr>
+  <tr><td>2</td><td>能量平衡方程</td><td>E<sub>输入</sub> = E<sub>有效</sub> + E<sub>损失</sub></td><td>GJ</td><td>平衡面板</td></tr>
+  <tr><td>3</td><td>平衡偏差率</td><td>d = |E<sub>输入</sub> − (E<sub>有效</sub>+ΣE<sub>损失</sub>)| ÷ E<sub>输入</sub></td><td>%</td><td>平衡面板</td></tr>
+  <tr><td>4</td><td>环节/设备能效</td><td>η<sub>环节</sub> = E<sub>有效输出</sub> ÷ E<sub>输入</sub></td><td>%</td><td>明细卡+分配表</td></tr>
+  <tr><td>5</td><td>损失占比</td><td>P<sub>损失,i</sub> = E<sub>损失,i</sub> ÷ E<sub>总损失</sub></td><td>%</td><td>损失排名+饼图</td></tr>
+  <tr><td>6</td><td>能源品种→GJ换算</td><td>GJ = 实物量 × 热值系数</td><td>GJ</td><td>数据预处理</td></tr>
+</table>
+
+<h2>4.8 界面设计要求</h2>
+<ul>
+  <li>顶部工具栏：组织架构级联选择器 + 日期范围 + 刷新按钮（与模块1/2/3一致）</li>
+  <li>KPI 卡片：4列网格，白色卡片样式，带左边框颜色标识</li>
+  <li>桑基图：全宽显示，480px高度，白色卡片容器，节点颜色区分能源类型，连线宽度对应能量流量</li>
+  <li>能量平衡面板：公式化展示（输入 = 有效 + 损失），中间等号/加号运算符，下挂校验徽章</li>
+  <li>平衡明细卡：5列网格，每列一张灰色背景小卡片，含品类名+四项数据</li>
+  <li>损失排名+饼图：左右并排，左侧排名列表+进度条，右侧环形饼图+图例</li>
+  <li>损失趋势：堆叠柱状图，月度/季度双Tab，底部图例</li>
+  <li>节点颜色规范：煤炭 #8B572A / 天然气 #2FC25B / 电力 #1890FF / 蒸汽 #FACC14 / 有效产出 #52C41A / 各类损失 红/橙/金色系</li>
+  <li>数字字体：D-DIN 用于所有数值显示</li>
+  <li>全部使用 Element UI 组件 + ECharts 图表（桑基图使用 echarts sankey 类型）</li>
+</ul>
+
+<h2>4.9 系统设置关联</h2>
+<table>
+  <tr><th>设置项</th><th>设置位置</th><th>说明</th></tr>
+  <tr><td>折标系数/热值系数</td><td>系统设置→折标系数管理</td><td>折标系数与GJ换算系数联动维护</td></tr>
+  <tr><td>平衡偏差告警阈值</td><td>系统设置→告警阈值设置</td><td>偏差率超5%自动触发数据质量告警</td></tr>
+  <tr><td>采集参数</td><td>系统设置→采集参数配置</td><td>各计量点的采集精度直接影响平衡偏差</td></tr>
+  <tr><td>组织架构</td><td>系统设置→组织架构设置</td><td>车间/产线/设备的调整影响能流节点拓扑</td></tr>
+  <tr><td>数据来源</td><td>模块1·能耗查询</td><td>各计量点的原始采集数据</td></tr>
+  <tr><td>数据来源</td><td>模块2·能源消费量</td><td>折标煤后的能耗数据</td></tr>
+</table>
+
+<h2>4.10 交付成果</h2>
+<table>
+  <tr><th>序号</th><th>交付物</th><th>说明</th></tr>
+  <tr><td>1</td><td>能流分析页面</td><td>src/views/energy/EnergyFlow.vue</td></tr>
+  <tr><td>2</td><td>桑基图组件</td><td>src/components/SankeyChart.vue（ECharts sankey 封装）</td></tr>
+  <tr><td>3</td><td>能流概况 KPI（4张）</td><td>总输入/有效利用/损失/能效比</td></tr>
+  <tr><td>4</td><td>能量平衡验证面板</td><td>公式展示+平衡校验徽章+5品类明细卡</td></tr>
+  <tr><td>5</td><td>能量流向分配明细表</td><td>8列分页表格</td></tr>
+  <tr><td>6</td><td>损失排名+类型分布</td><td>8项排名条+6类环形饼图</td></tr>
+  <tr><td>7</td><td>损失趋势图</td><td>月度/季度切换的堆叠柱状图</td></tr>
+</table>
+
+<div class="note">
+  <b>说明：</b>本文档基于系统实际开发输出（2026-08-11），与系统功能保持一致。桑基图的节点拓扑和能量流线基于完整工厂数据模型V3中的39个计量点和5级组织架构设计。能量平衡偏差阈值和损失分类可在系统设置中动态配置。
+</div>
+
+</body>
+</html>

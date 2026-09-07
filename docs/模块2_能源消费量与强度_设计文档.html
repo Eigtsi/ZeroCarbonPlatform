@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>模块2：能源消费量和强度计算 — 产品设计文档</title>
+<style>
+  body { font-family: 'Microsoft YaHei','SimSun',sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.8; }
+  h1 { text-align: center; font-size: 22px; border-bottom: 2px solid #1890FF; padding-bottom: 12px; }
+  h2 { font-size: 18px; border-left: 3px solid #1890FF; padding-left: 10px; margin-top: 32px; }
+  h3 { font-size: 15px; color: #1890FF; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid #d9d9d9; padding: 6px 10px; text-align: left; }
+  th { background: #f5f5f5; font-weight: 600; }
+  p { margin: 8px 0; }
+  .meta { text-align: center; color: #999; font-size: 13px; margin-bottom: 24px; }
+  ul { margin: 4px 0; padding-left: 24px; }
+  .note { background: #fafafa; border-left: 3px solid #faad14; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>模块2：能源消费量和强度计算</h1>
+<p class="meta">版本 V2.0 | 更新日期：2026-08-04 | 基于系统实际开发输出</p>
+
+<h2>2.1 功能定位</h2>
+<p>能源消费量和强度计算模块是能碳管理平台的核心统计模块，负责将各用能单元采集的原始能源数据按 GB/T 2589《综合能耗计算通则》折算为标准煤（tce），并在此基础上计算单位产值能耗、单位增加值能耗、单位产品能耗等强度指标，为能效对标和目标考核提供数据基础。</p>
+
+<p>本模块拆分为两个独立子页面：<b>能源消费量</b>和<b>能源强度</b>，通过侧边栏二级菜单进入。</p>
+
+<h2>2.2 功能概述</h2>
+
+<h3>2.2.1 能源消费量</h3>
+<ul>
+  <li>综合能耗计算：按6大能源品类（固体燃料/液体燃料/气体燃料/电力/热力/其他燃料）汇总实物消耗量，乘以折标系数，得出各品种折标煤量及占比</li>
+  <li>品类统计看板：6张 KPI 卡片分别展示六大品类的 tce 值和环比趋势</li>
+  <li>车间产值填报：各车间/产线的当期产值录入，用于计算单位产值能耗</li>
+  <li>按车间/产线汇总的能源消费明细表，展示各车间六大品类消耗和合计</li>
+  <li>自由日期范围选择，支持任意起止日期查询</li>
+</ul>
+
+<h3>2.2.2 能源强度</h3>
+<ul>
+  <li>强度指标计算：单位产值能耗、单位增加值能耗、单位产品能耗、节能量</li>
+  <li>强度趋势图：按月展示单位产值能耗和单位增加值能耗的变化趋势</li>
+  <li>产品产量填报：各产线的主要产品、产量录入，自动计算单位产品能耗</li>
+  <li>能效排名：按车间/产线的能耗强度排名，含能效等级评定</li>
+  <li>目标考核：年度强度目标、节能量目标、下降率目标、清洁能源占比目标的完成进度</li>
+  <li>自由日期范围选择</li>
+</ul>
+
+<h2>2.3 用户角色</h2>
+<table>
+  <tr><th>角色</th><th>权限</th></tr>
+  <tr><td>能源管理员</td><td>全部功能：查询、填报产值/产量、查看排名、导出报表</td></tr>
+  <tr><td>部门经理</td><td>查看本车间数据、填报本车间产值/产量</td></tr>
+  <tr><td>设备工程师</td><td>查看能源消费明细</td></tr>
+  <tr><td>只读用户</td><td>查看所有数据，无填报权限</td></tr>
+</table>
+
+<h2>2.4 能源品类</h2>
+<p>按 GB/T 2589 六大形态分类，覆盖 8 种主要能源品种：</p>
+<table>
+  <tr><th>能源品类</th><th>品种</th><th>实物单位</th><th>折标系数(kgce/单位)</th><th>数据来源</th></tr>
+  <tr><td>固体燃料</td><td>原煤</td><td>t</td><td>0.7143</td><td>GB/T 2589</td></tr>
+  <tr><td>固体燃料</td><td>洗精煤</td><td>t</td><td>0.9000</td><td>GB/T 2589</td></tr>
+  <tr><td>液体燃料</td><td>柴油</td><td>t</td><td>1.4571</td><td>GB/T 2589</td></tr>
+  <tr><td>液体燃料</td><td>汽油</td><td>t</td><td>1.4714</td><td>GB/T 2589</td></tr>
+  <tr><td>气体燃料</td><td>天然气</td><td>万m³</td><td>12.143</td><td>GB/T 2589</td></tr>
+  <tr><td>电力</td><td>外购电力</td><td>万kWh</td><td>1.229</td><td>GB/T 2589（当量值）</td></tr>
+  <tr><td>热力</td><td>低压蒸汽</td><td>t</td><td>0.0900</td><td>焓值计算</td></tr>
+  <tr><td>其他燃料</td><td>甲醇</td><td>t</td><td>0.7714</td><td>GB/T 2589</td></tr>
+</table>
+
+<h2>2.5 页面功能详述</h2>
+
+<h3>2.5.1 能源消费量子页面</h3>
+<h4>2.5.1.1 顶部工具栏</h4>
+<ul>
+  <li>组织架构级联选择器（集团→公司→车间→产线→设备）</li>
+  <li>自由日期范围选择器（开始日期 ~ 结束日期）</li>
+  <li>综合能耗合计显示（右侧醒目展示，蓝色大号 D-DIN 字体）</li>
+  <li>刷新按钮</li>
+</ul>
+
+<h4>2.5.1.2 六品类统计 KPI 卡片</h4>
+<ul>
+  <li>固体燃料 / 液体燃料 / 气体燃料 / 电力 / 热力 / 其他燃料</li>
+  <li>每张卡片显示：品类名称、折算后 tce 值、环比趋势百分比</li>
+</ul>
+
+<h4>2.5.1.3 综合能耗计算表（折标准煤）</h4>
+<table>
+  <tr><th>列名</th><th>说明</th></tr>
+  <tr><td>序号</td><td>行号</td></tr>
+  <tr><td>能源品类</td><td>6大品类名称</td></tr>
+  <tr><td>能源品种</td><td>具体品种名称（带色点标识）</td></tr>
+  <tr><td>实物消耗量</td><td>原始计量单位的消耗量</td></tr>
+  <tr><td>单位</td><td>实物计量单位（t, 万m³, 万kWh等）</td></tr>
+  <tr><td>折标系数</td><td>kgce/单位（可编辑）</td></tr>
+  <tr><td>折标煤(tce)</td><td>= 实物消耗量 × 折标系数</td></tr>
+  <tr><td>占比</td><td>该品种占综合能耗的百分比</td></tr>
+</table>
+<p>表格底部有合计行（自动汇总）。</p>
+
+<h4>2.5.1.4 能源消费明细（按车间/产线）</h4>
+<p>以车间/产线为行，6大品类为列的交叉统计表：</p>
+<table>
+  <tr><th>列名</th><th>说明</th></tr>
+  <tr><td>车间/产线</td><td>8个主要用能单元</td></tr>
+  <tr><td>固体燃料(tce)</td><td>该车间固体燃料消费量</td></tr>
+  <tr><td>液体燃料(tce)</td><td>该车间液体燃料消费量</td></tr>
+  <tr><td>气体燃料(tce)</td><td>该车间气体燃料消费量</td></tr>
+  <tr><td>电力(tce)</td><td>该车间电力消费量</td></tr>
+  <tr><td>热力(tce)</td><td>该车间热力消费量</td></tr>
+  <tr><td>其他燃料(tce)</td><td>该车间其他燃料消费量</td></tr>
+  <tr><td>合计(tce)</td><td>该车间综合能耗合计</td></tr>
+</table>
+<p>支持分页（每页10/20/30/50条）。</p>
+
+<h4>2.5.1.5 各车间综合产值填报</h4>
+<table>
+  <tr><th>列名</th><th>说明</th></tr>
+  <tr><td>序号</td><td>行号</td></tr>
+  <tr><td>车间/产线</td><td>8个车间/产线名称</td></tr>
+  <tr><td>产值（万元）</td><td>可编辑的数值输入框</td></tr>
+  <tr><td>填报人</td><td>录入人员姓名</td></tr>
+  <tr><td>填报日期</td><td>填报日期（自动或手动）</td></tr>
+</table>
+<p>带有"保存产值数据"按钮。</p>
+
+<h3>2.5.2 能源强度子页面</h3>
+<h4>2.5.2.1 顶部工具栏</h4>
+<ul>
+  <li>组织架构级联选择器</li>
+  <li>自由日期范围选择器</li>
+  <li>刷新按钮</li>
+</ul>
+
+<h4>2.5.2.2 四指标 KPI 卡片</h4>
+<ul>
+  <li>单位产值能耗（tce/万元）+ 下降趋势</li>
+  <li>单位增加值能耗（tce/万元）+ 下降趋势</li>
+  <li>单位产品能耗（kgce/t）</li>
+  <li>节能量（tce）+ 增长趋势</li>
+</ul>
+
+<h4>2.5.2.3 能耗强度指标面板</h4>
+<p>三项核心指标卡片，每项展示：</p>
+<ul>
+  <li>指标名称和变化趋势百分比</li>
+  <li>当前值（大号数字）</li>
+  <li>进度条（当前值/目标值）</li>
+  <li>目标值参考线</li>
+</ul>
+
+<h4>2.5.2.4 能源强度趋势图</h4>
+<p>折线图，按月展示单位产值能耗和单位增加值能耗的变化趋势，横轴为1-12月，纵轴为 tce/万元。</p>
+
+<h4>2.5.2.5 产品产量填报</h4>
+<table>
+  <tr><th>列名</th><th>说明</th></tr>
+  <tr><td>产线</td><td>5条主要产线</td></tr>
+  <tr><td>主要产品</td><td>产品名称</td></tr>
+  <tr><td>产量</td><td>可编辑数值</td></tr>
+  <tr><td>单位</td><td>产品计量单位（t/m²/台等）</td></tr>
+  <tr><td>综合能耗(tce)</td><td>该产线的综合能耗</td></tr>
+  <tr><td>单位产品能耗</td><td>= 综合能耗 ÷ 产量，自动计算</td></tr>
+</table>
+<p>标题栏显示计算公式：<b>单位产品能耗 = 综合能耗 ÷ 产品产量</b></p>
+
+<h4>2.5.2.6 能效排名</h4>
+<p>按车间/产线排名的表格：</p>
+<table>
+  <tr><th>列名</th><th>说明</th></tr>
+  <tr><td>排名</td><td>1-8（彩色排名徽章）</td></tr>
+  <tr><td>车间/产线</td><td>8个用能单元</td></tr>
+  <tr><td>产值(万元)</td><td>当期产值</td></tr>
+  <tr><td>综合能耗(tce)</td><td>当期综合能耗</td></tr>
+  <tr><td>能耗强度(tce/万元)</td><td>= 综合能耗 ÷ 产值</td></tr>
+  <tr><td>能效等级</td><td>1级（先进）/ 2级（中等）/ 3级（落后）</td></tr>
+</table>
+
+<h4>2.5.2.7 目标考核</h4>
+<p>4项目标进度的进度条展示：</p>
+<table>
+  <tr><th>指标</th><th>目标值</th><th>说明</th></tr>
+  <tr><td>年度能耗强度目标</td><td>0.40 tce/万元</td><td>可在系统设置→强度目标设置中修改</td></tr>
+  <tr><td>年度节能量目标</td><td>500 tce</td><td>累计节能量</td></tr>
+  <tr><td>万元产值能耗下降率</td><td>5.0%</td><td>同比降幅</td></tr>
+  <tr><td>清洁能源占比提升</td><td>40%</td><td>光伏+储能占比</td></tr>
+</table>
+
+<h3>2.5.3 能效等级判定标准</h3>
+<h4>2.5.3.1 车间/产线能耗强度等级（能效排名表）</h4>
+<p>判定公式：<b>e<sub>车间</sub> = E<sub>车间综合能耗</sub> &divide; V<sub>车间产值</sub></b></p>
+<table><tr><th>等级</th><th>条件</th><th>颜色</th><th>含义</th></tr><tr><td>1级（先进）</td><td>e &le; 0.35 tce/万元</td><td style="color:#52C41A">绿色</td><td>全国同行业前20%</td></tr><tr><td>2级（中等）</td><td>0.35 &lt; e &le; 0.50</td><td style="color:#FAAD14">橙色</td><td>行业中等水平</td></tr><tr><td>3级（落后）</td><td>e &gt; 0.50</td><td style="color:#FF4D4F">红色</td><td>需重点改进</td></tr></table>
+<p class="note">阈值可在 <b>系统设置 &rarr; 强度目标设置 &rarr; 各车间年度能耗强度目标</b> 中按车间独立配置。</p>
+
+<h4>2.5.3.2 单位产品能耗等级（单位产品能耗排名表）</h4>
+<p>判定公式：<b>e<sub>产品</sub> = E<sub>产线综合能耗</sub> &divide; Q<sub>产品产量</sub></b></p>
+<table><tr><th>等级</th><th>条件</th><th>颜色</th><th>含义</th></tr><tr><td>1级（先进）</td><td>e &le; 0.20 tce/单位</td><td style="color:#52C41A">绿色</td><td>行业领先水平</td></tr><tr><td>2级（中等）</td><td>0.20 &lt; e &le; 0.40</td><td style="color:#FAAD14">橙色</td><td>行业中等水平</td></tr><tr><td>3级（落后）</td><td>e &gt; 0.40</td><td style="color:#FF4D4F">红色</td><td>需工艺优化</td></tr></table>
+<p class="note">不同产品的产量单位不同（t / m&sup2; / 台），判定阈值统一处理。如需为不同产品设置独立阈值，可在系统设置中扩展。</p>
+
+<h2>2.6 指标计算公式详解</h2>
+
+<h3>2.6.1 综合能耗（E<sub>tce</sub>）— 能源消费量页·工具栏右侧 + 折标煤表合计行</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>E<sub>tce</sub> = Σ<sub>i=1</sub><sup>n</sup> (E<sub>i</sub> × K<sub>i</sub>)</b></td></tr>
+  <tr><td>符号说明</td><td>E<sub>i</sub>：第 i 种能源品种的实物消耗量（t / 万m³ / 万kWh 等）<br>K<sub>i</sub>：第 i 种能源品种的折标准煤系数（kgce/单位），n=8（8种能源品种）</td></tr>
+  <tr><td>数据来源</td><td>E<sub>i</sub> 来自各计量点采集的实物消耗量；K<sub>i</sub> 来自系统设置→折标系数管理（参照 GB/T 2589）</td></tr>
+  <tr><td>计算示例</td><td>原煤消耗 1,256.80 t × 0.7143 = 897.92 tce；天然气 45.80 万m³ × 12.143 = 556.15 tce<br>综合能耗 = 897.92 + 108.00 + 32.78 + 12.07 + 556.15 + 289.68 + 77.04 + 9.26 = 1,906.78 tce</td></tr>
+  <tr><td>显示位置</td><td>能源消费量页·工具栏右侧（蓝色大字）+ 折标煤表合计行</td></tr>
+  <tr><td>更新频率</td><td>每次查询/刷新时重新计算</td></tr>
+</table>
+
+<h3>2.6.2 六大品类 tce 值 — 能源消费量页·KPI 卡片行</h3>
+<table>
+  <tr><th>品类</th><th>公式</th><th>示例</th></tr>
+  <tr><td>固体燃料</td><td>E<sub>固体</sub> = E<sub>原煤</sub>×K<sub>原煤</sub> + E<sub>洗精煤</sub>×K<sub>洗精煤</sub> + E<sub>焦炭</sub>×K<sub>焦炭</sub> + E<sub>煤矸石</sub>×K<sub>煤矸石</sub></td><td>897.92 + 108.00 = 1,005.92 tce</td></tr>
+  <tr><td>液体燃料</td><td>E<sub>液体</sub> = E<sub>原油</sub>×K<sub>原油</sub> + E<sub>汽油</sub>×K<sub>汽油</sub> + E<sub>煤油</sub>×K<sub>煤油</sub> + E<sub>柴油</sub>×K<sub>柴油</sub> + E<sub>燃料油</sub>×K<sub>燃料油</sub> + E<sub>LPG</sub>×K<sub>LPG</sub></td><td>32.78 + 12.07 = 44.85 tce</td></tr>
+  <tr><td>气体燃料</td><td>E<sub>气体</sub> = E<sub>天然气</sub>×K<sub>天然气</sub> + E<sub>焦炉煤气</sub>×K<sub>焦炉煤气</sub> + E<sub>高炉煤气</sub>×K<sub>高炉煤气</sub> + ...</td><td>556.15 tce</td></tr>
+  <tr><td>电力</td><td>E<sub>电力</sub> = Σ (E<sub>电力,j</sub> × K<sub>电力</sub>)，K<sub>电力</sub>=1.229 kgce/万kWh</td><td>289.68 tce</td></tr>
+  <tr><td>热力</td><td>E<sub>热力</sub> = E<sub>蒸汽</sub> × K<sub>蒸汽</sub> + E<sub>热水</sub> × K<sub>热水</sub></td><td>77.04 tce</td></tr>
+  <tr><td>其他燃料</td><td>E<sub>其他</sub> = E<sub>甲醇</sub>×K<sub>甲醇</sub> + E<sub>乙醇</sub>×K<sub>乙醇</sub> + E<sub>氢气</sub>×K<sub>氢气</sub> + E<sub>生物质</sub>×K<sub>生物质</sub></td><td>9.26 tce</td></tr>
+</table>
+<p class="note"><b>注意：</b>品类 KPI 值为该品类下所有子品种折标煤之和。当品类下只有一个品种时直接使用该品种的 tce 值。KPI 卡片同步显示环比趋势（本期与上期对比的变化率）。</p>
+
+<h3>2.6.3 单个能源品种折标煤 — 综合能耗计算表</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>tce<sub>i</sub> = E<sub>i</sub> × K<sub>i</sub></b></td></tr>
+  <tr><td>符号</td><td>tce<sub>i</sub>：第 i 个品种的折标煤量(tce)；E<sub>i</sub>：实物消耗量；K<sub>i</sub>：折标系数(kgce/单位)</td></tr>
+  <tr><td>示例</td><td>原煤：1,256.80 t × 0.7143 = 897.92 tce；洗精煤：120.00 t × 0.9000 = 108.00 tce</td></tr>
+</table>
+
+<h3>2.6.4 各品种占比 — 综合能耗计算表·占比列</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>P<sub>i</sub> = (tce<sub>i</sub> ÷ E<sub>tce</sub>) × 100%</b></td></tr>
+  <tr><td>符号</td><td>P<sub>i</sub>：第 i 个品种占综合能耗的百分比；tce<sub>i</sub>：第 i 个品种的折标煤量；E<sub>tce</sub>：综合能耗合计</td></tr>
+  <tr><td>示例</td><td>原煤占比 = 897.92 ÷ 1,906.78 × 100% = 47.1%；天然气占比 = 556.15 ÷ 1,906.78 × 100% = 29.2%</td></tr>
+  <tr><td>验证</td><td>所有品种占比之和 = 100%</td></tr>
+</table>
+
+<h3>2.6.5 车间/产线综合能耗 — 能源消费明细表·合计列</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>E<sub>车间</sub> = E<sub>固体</sub> + E<sub>液体</sub> + E<sub>气体</sub> + E<sub>电力</sub> + E<sub>热力</sub> + E<sub>其他</sub></b></td></tr>
+  <tr><td>符号</td><td>E<sub>车间</sub>：该车间/产线在所选时间段内的综合能耗(tce)，各项为六大品类在该车间的消费量</td></tr>
+  <tr><td>示例</td><td>一车间A线合计 = 320.5 + 12.3 + 45.2 + 85.6 + 22.1 + 2.5 = 488.2 tce</td></tr>
+</table>
+
+<h3>2.6.6 环比变化率 — KPI 卡片趋势标签</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>Δ = (E<sub>本期</sub> - E<sub>上期</sub>) ÷ E<sub>上期</sub> × 100%</b></td></tr>
+  <tr><td>符号</td><td>E<sub>本期</sub>：所选时间段的品类 tce 值；E<sub>上期</sub>：上一相等长度时间段的品类 tce 值</td></tr>
+  <tr><td>趋势方向</td><td>Δ > 0 → ↑ 增长（红色，能耗增加为不利）；Δ < 0 → ↓ 下降（绿色，能耗减少为有利）</td></tr>
+  <tr><td>示例</td><td>固体燃料：本期 1,005.92，上期 978.52 → Δ = (1005.92-978.52)÷978.52 = 2.8% ↑</td></tr>
+</table>
+
+<h3>2.6.7 单位产值能耗 — 能源强度页·KPI + 强度指标面板</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>e<sub>产值</sub> = E<sub>tce</sub> ÷ V</b></td></tr>
+  <tr><td>符号</td><td>e<sub>产值</sub>：单位产值能耗(tce/万元)；E<sub>tce</sub>：综合能耗(tce)；V：产值(万元，来自能源消费量页→产值填报表)</td></tr>
+  <tr><td>示例</td><td>E<sub>tce</sub> = 1,906.78 tce，V = 5,017.89 万元 → e<sub>产值</sub> = 1,906.78 ÷ 5,017.89 = 0.38 tce/万元</td></tr>
+  <tr><td>参考标准</td><td>GB/T 32045《工业企业能源管理体系实施指南》</td></tr>
+</table>
+
+<h3>2.6.8 单位增加值能耗 — 能源强度页·KPI + 强度指标面板</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>e<sub>增加</sub> = E<sub>tce</sub> ÷ V<sub>add</sub></b></td></tr>
+  <tr><td>符号</td><td>e<sub>增加</sub>：单位增加值能耗(tce/万元)；E<sub>tce</sub>：综合能耗(tce)；V<sub>add</sub>：工业增加值(万元) = 产值 - 中间投入</td></tr>
+  <tr><td>示例</td><td>E<sub>tce</sub> = 1,906.78 tce，V<sub>add</sub> = 3,668.81 万元 → e<sub>增加</sub> = 0.52 tce/万元</td></tr>
+</table>
+
+<h3>2.6.9 单位产品能耗 — 能源强度页·产品产量填报表</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>e<sub>产品</sub> = E<sub>tce,产线</sub> ÷ Q</b></td></tr>
+  <tr><td>符号</td><td>e<sub>产品</sub>：该产线单位产品能耗(tce/单位产品)；E<sub>tce,产线</sub>：该产线的综合能耗(tce)；Q：产品产量(t/m²/台等)</td></tr>
+  <tr><td>示例</td><td>A线(粗加工)：E<sub>tce</sub>=325.6，Q=1,250 t → e<sub>产品</sub>=0.260 tce/t<br>E线(总装)：E<sub>tce</sub>=127.5，Q=580 台 → e<sub>产品</sub>=0.220 tce/台</td></tr>
+  <tr><td>设计要点</td><td>不同产线/产品使用不同的产量单位（t / m² / 台），系统自动识别并计算</td></tr>
+</table>
+
+<h3>2.6.10 节能量 — 能源强度页·KPI 卡片</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>S = E<sub>tce,基期</sub> - E<sub>tce,本期</sub></b></td></tr>
+  <tr><td>符号</td><td>S：节能量(tce)；E<sub>tce,基期</sub>：基期综合能耗（上一年同期）；E<sub>tce,本期</sub>：本期综合能耗</td></tr>
+  <tr><td>替代公式</td><td><b>S = (e<sub>基期</sub> - e<sub>本期</sub>) × V<sub>本期</sub></b>（基于强度变化计算）</td></tr>
+  <tr><td>示例</td><td>基期 2,088.78 - 本期 1,906.78 = 182 tce 节能量；（另一种算法）：(0.42-0.38)×5,017.89 = 200.72 ≈ 201 tce。实际取值取节能措施累加值</td></tr>
+</table>
+
+<h3>2.6.11 能耗强度 — 能效排名表</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>e<sub>车间</sub> = E<sub>车间</sub> ÷ V<sub>车间</sub></b></td></tr>
+  <tr><td>符号</td><td>e<sub>车间</sub>：该车间的能耗强度(tce/万元)；E<sub>车间</sub>：该车间的综合能耗(tce)；V<sub>车间</sub>：该车间的产值(万元)</td></tr>
+  <tr><td>示例</td><td>一车间A线：1,825.60 ÷ 5,680.00 = 0.32 tce/万元 → 排名第1<br>锅炉房：558.58 ÷ 980.00 = 0.57 tce/万元 → 排名第8</td></tr>
+  <tr><td>能效等级判定</td><td>e ≤ 0.35 → 1级（先进）；0.35 < e ≤ 0.50 → 2级（中等）；e > 0.50 → 3级（落后）。阈值可在系统设置→强度目标设置中配置</td></tr>
+</table>
+
+<h3>2.6.12 目标考核完成率 — 目标考核进度条</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>R = Q<sub>actual</sub> ÷ Q<sub>target</sub> × 100%</b>（目标值越低越好时，如能耗强度）<br>或 <b>R = Q<sub>actual</sub> ÷ Q<sub>target</sub> × 100%</b>（目标值越高越好时，如节能量）</td></tr>
+  <tr><td>符号</td><td>R：完成率(%）；Q<sub>actual</sub>：实际值；Q<sub>target</sub>：目标值（来自系统设置→强度目标设置）</td></tr>
+  <tr><td>示例</td><td>年度强度目标：0.40 tce/万元，实际 0.38 → 越低越好 → R = 0.40÷0.38 ≈ 105%（超额完成，显示 95% 保守值）<br>节能量目标：500 tce，实际 380 tce → R = 380÷500 = 76%</td></tr>
+  <tr><td>进度条颜色</td><td>R ≥ 100% → 绿色(#52C41A)；80% ≤ R < 100% → 蓝色(#1890FF)；R < 80% → 橙色(#FAAD14)</td></tr>
+</table>
+
+<h3>2.6.13 化石能源占比 — 能源消费量页·KPI</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>P<sub>化石</sub> = (E<sub>固体</sub> + E<sub>液体</sub> + E<sub>气体</sub>) ÷ E<sub>tce</sub> × 100%</b></td></tr>
+  <tr><td>示例</td><td>(1,005.92 + 44.85 + 556.15) ÷ 1,906.78 = 84.3%</td></tr>
+</table>
+
+<h3>2.6.14 清洁能源占比 — 能源消费量页·KPI</h3>
+<table>
+  <tr><th>项目</th><th>内容</th></tr>
+  <tr><td>公式</td><td><b>P<sub>清洁</sub> = (E<sub>电力(光伏/风电/水电)</sub> + E<sub>生物质</sub>) ÷ E<sub>tce</sub> × 100%</b></td></tr>
+  <tr><td>示例</td><td>光伏发电对应电力约占 15.7%（含光伏自发自用部分）</td></tr>
+  <tr><td>验证</td><td>化石占比 + 清洁占比 = 100%</td></tr>
+</table>
+
+<h3>2.6.15 公式汇总速查表</h3>
+<table>
+  <tr><th>序号</th><th>指标名称</th><th>公式</th><th>单位</th><th>所在页面</th></tr>
+  <tr><td>1</td><td>综合能耗</td><td>E<sub>tce</sub> = Σ(E<sub>i</sub> × K<sub>i</sub>)</td><td>tce</td><td>能源消费量·工具栏+合计行</td></tr>
+  <tr><td>2</td><td>品类 tce</td><td>E<sub>品类</sub> = Σ(E<sub>子品种</sub> × K)</td><td>tce</td><td>能源消费量·KPI卡片</td></tr>
+  <tr><td>3</td><td>品种折标煤</td><td>tce<sub>i</sub> = E<sub>i</sub> × K<sub>i</sub></td><td>tce</td><td>能源消费量·折标煤表</td></tr>
+  <tr><td>4</td><td>品种占比</td><td>P<sub>i</sub> = tce<sub>i</sub> ÷ E<sub>tce</sub> × 100%</td><td>%</td><td>能源消费量·折标煤表</td></tr>
+  <tr><td>5</td><td>车间综合能耗</td><td>E<sub>车间</sub> = Σ 六品类之和</td><td>tce</td><td>能源消费量·明细表</td></tr>
+  <tr><td>6</td><td>环比变化率</td><td>Δ = (本期-上期)÷上期×100%</td><td>%</td><td>KPI卡片趋势标签</td></tr>
+  <tr><td>7</td><td>单位产值能耗</td><td>e<sub>产值</sub> = E<sub>tce</sub> ÷ V</td><td>tce/万元</td><td>能源强度·KPI+强度面板</td></tr>
+  <tr><td>8</td><td>单位增加值能耗</td><td>e<sub>增加</sub> = E<sub>tce</sub> ÷ V<sub>add</sub></td><td>tce/万元</td><td>能源强度·KPI+强度面板</td></tr>
+  <tr><td>9</td><td>单位产品能耗</td><td>e<sub>产品</sub> = E<sub>tce,产线</sub> ÷ Q</td><td>tce/单位</td><td>能源强度·产品产量表</td></tr>
+  <tr><td>10</td><td>节能量</td><td>S = E<sub>基期</sub> - E<sub>本期</sub></td><td>tce</td><td>能源强度·KPI</td></tr>
+  <tr><td>11</td><td>车间能耗强度</td><td>e<sub>车间</sub> = E<sub>车间</sub> ÷ V<sub>车间</sub></td><td>tce/万元</td><td>能源强度·能效排名表</td></tr>
+  <tr><td>12</td><td>目标完成率</td><td>R = Q<sub>实际</sub> ÷ Q<sub>目标</sub> × 100%</td><td>%</td><td>能源强度·目标考核</td></tr>
+  <tr><td>13</td><td>化石能源占比</td><td>P<sub>化石</sub> = (E<sub>固体</sub>+E<sub>液体</sub>+E<sub>气体</sub>)÷E<sub>tce</sub></td><td>%</td><td>能源消费量·KPI</td></tr>
+  <tr><td>14</td><td>清洁能源占比</td><td>P<sub>清洁</sub> = (E<sub>可再生电力</sub>+E<sub>生物质</sub>)÷E<sub>tce</sub></td><td>%</td><td>能源消费量·KPI</td></tr>
+</table>
+
+<h2>2.7 界面设计要求</h2>
+<ul>
+  <li>顶部工具栏：组织架构级联选择器 + 日期范围 + 综合能耗合计（右侧）</li>
+  <li>KPI 卡片行：6列网格（能源消费量）/ 4列网格（能源强度）</li>
+  <li>数据表格：白色卡片样式，圆角 8px，阴影</li>
+  <li>数字字体：D-DIN（等宽数字）用于所有数值显示</li>
+  <li>品类颜色：固体燃料 #4A4A4A / 液体燃料 #CD853F / 气体燃料 #2FC25B / 电力 #1890FF / 热力 #FACC14 / 其他燃料 #722ED1</li>
+  <li>能效等级：1级绿色 / 2级橙色 / 3级红色</li>
+  <li>全部使用 Element UI 组件 + ECharts 图表</li>
+</ul>
+
+<h2>2.8 系统设置关联</h2>
+<p>本模块依赖以下系统设置项：</p>
+<table>
+  <tr><th>设置项</th><th>设置位置</th><th>说明</th></tr>
+  <tr><td>折标系数</td><td>系统设置→折标系数管理</td><td>8种能源品种的折标系数可在此修改</td></tr>
+  <tr><td>强度目标值</td><td>系统设置→强度目标设置</td><td>各车间强度目标、节能量目标</td></tr>
+  <tr><td>组织架构</td><td>系统设置→组织架构设置</td><td>车间/产线/设备的新增与调整</td></tr>
+  <tr><td>能效等级标准</td><td>强度目标设置</td><td>1/2/3级的能耗强度阈值</td></tr>
+</table>
+
+<h2>2.9 交付成果</h2>
+<table>
+  <tr><th>序号</th><th>交付物</th><th>说明</th></tr>
+  <tr><td>1</td><td>能源消费量子页面</td><td>src/views/energy/intensity/Consumption.vue</td></tr>
+  <tr><td>2</td><td>能源强度子页面</td><td>src/views/energy/intensity/IntensityCalc.vue</td></tr>
+  <tr><td>3</td><td>综合能耗计算表</td><td>含8种能源品种的折标煤计算和占比</td></tr>
+  <tr><td>4</td><td>按车间/产线消费明细表</td><td>6品类×8车间的交叉统计</td></tr>
+  <tr><td>5</td><td>产值/产量填报功能</td><td>支持在线编辑和保存</td></tr>
+  <tr><td>6</td><td>能效排名表</td><td>8车间排名 + 等级评定</td></tr>
+  <tr><td>7</td><td>目标考核进度</td><td>4项目标的完成进度可视化</td></tr>
+</table>
+
+<div class="note">
+  <b>说明：</b>本文档基于系统实际开发输出（2026-08-04），与系统功能保持一致。原始设计文档的产品产量填报、折标系数管理、强度目标设置等功能已扩展为可配置的系统设置模块。
+</div>
+
+</body>
+</html>

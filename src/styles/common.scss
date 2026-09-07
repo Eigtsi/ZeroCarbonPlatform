@@ -1,0 +1,118 @@
+// 公共样式类
+@import './fonts.scss';
+@import './reset.scss';
+
+// ---- 字体工具类 ----
+.font-d-din {
+  font-family: $font-d-din;
+}
+
+.font-title {
+  font-family: $font-title;
+}
+
+.font-body {
+  font-family: $font-body;
+}
+
+// ---- 文本工具类 ----
+.text-primary { color: $text-primary; }
+.text-regular { color: $text-regular; }
+.text-secondary { color: $text-secondary; }
+.text-success { color: $success-color; }
+.text-warning { color: $warning-color; }
+.text-danger { color: $danger-color; }
+.text-info { color: $info-color; }
+
+// ---- 数值闪烁动画 ----
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.flash-animate {
+  animation: flash $flash-duration ease-in-out;
+}
+
+// ---- 布局工具类 ----
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+// ---- 间距工具类 ----
+.mt-sm { margin-top: $spacing-sm; }
+.mt-md { margin-top: $spacing-md; }
+.mt-lg { margin-top: $spacing-lg; }
+.mb-sm { margin-bottom: $spacing-sm; }
+.mb-md { margin-bottom: $spacing-md; }
+.mb-lg { margin-bottom: $spacing-lg; }
+.ml-sm { margin-left: $spacing-sm; }
+.mr-sm { margin-right: $spacing-sm; }
+.p-md { padding: $spacing-md; }
+.p-lg { padding: $spacing-lg; }
+
+// ---- 告警标签 ----
+.alarm-red {
+  color: $alarm-red;
+  background: rgba($alarm-red, 0.1);
+  border-color: rgba($alarm-red, 0.3);
+}
+
+.alarm-yellow {
+  color: $alarm-yellow;
+  background: rgba($alarm-yellow, 0.1);
+  border-color: rgba($alarm-yellow, 0.3);
+}
+
+.alarm-blue {
+  color: $alarm-blue;
+  background: rgba($alarm-blue, 0.1);
+  border-color: rgba($alarm-blue, 0.3);
+}
+
+// ---- 页面容器 ----
+.page-container {
+  padding: $spacing-lg;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page-title {
+  font-family: $font-title;
+  font-size: $font-size-20;
+  line-height: 26px;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+}
+
+// ---- 卡片网格 ----
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: $spacing-md;
+}
